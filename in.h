@@ -2,15 +2,21 @@
 
 #ifndef __INH_INCED__
 #define __INH_INCED__
+
 #include <ncurses.h>
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <list>
-#include <stdlib.h>
+#include <random>
+//#include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <math.h>
 
-#if 1 
+#define MY_PI 3.14159265359
+
+#if 1
 #define C_DW 0
 #define C_DR 1
 #define C_DG 2
@@ -29,85 +35,109 @@
 #define C_LW 15
 #endif
 
-const int DWID = 40;
-const int DHGT = 20;
+#define DWID 40
+#define DHGT 20
 
-int rn(int n)
-{
-  if (n <= 0) return 0;
-	return (rand() % n);
-}
+int rn (int n);
+
+double rndd (double maxpoint);
+
+void mysleep (int n);
+
+void pcen (std::string s, int y);
 
 void
-mysleep(int n)
-{
-  usleep(n*1000);
-}
-
-void pcen(std::string s, int y)
-{
-  int len = s.length();
-	mvaddstr(y, (DWID-len)/2, s.c_str());
-}
-
-void waitk()
-{
-  while (1)
-  {
-    char ch = getch();
-    if (ch == ' ' || ch == '\033' || ch == '\n' || ch == '\r')
-    {
-      break;
-    }
-  }
-}
+waitk ();
 
 int
-initall ()
-{
-  int f;
-  initscr ();
-	noecho();
-  start_color ();
-  for (f = 0; f < 16; f++)
-  {
-    init_pair (f, f, 0);
-  }
-	curs_set(0);
-  clear ();
-  srand (time (0));
-  return 0;
-}
+initall ();
 
 void
-cleanall ()
-{
-  curs_set (1);
-  endwin ();
-}
+cleanall ();
 
-void
-set_color (int i)
-{
-  attrset (COLOR_PAIR (i));
-}
+void set_color (int i);
 
-class dpos {
+class pos
+{
 private:
-  double dx, dy, r;
+	int x, y;
 public:
-	double x(){return dx;}
-	double y(){return dy;}
-	void stx(double x){dx=x;}
-	void sty(double y){dy=y;}
-	dpos(double x=0, double y=0, double r=0)
+	int gtx ()
 	{
-    dx=x;
-		dy = y;
-		this->r=r;
+		return x;
+	}
+	int gty ()
+	{
+		return y;
+	}
+	void stx (int n)
+	{
+		x = n;
+	}
+	void sty (int n)
+	{
+		y = n;
+	}
+	pos (int x, int y):x (x), y (y)
+	{;
 	}
 };
 
+class dpos
+{
+private:
+	double dx, dy, r;
+public:
+	double x ()
+	{
+		return dx;
+	}
+	double y ()
+	{
+		return dy;
+	}
+	void stx (double x)
+	{
+		dx = x;
+	}
+	void sty (double y)
+	{
+		dy = y;
+	}
+	dpos (double x = 0, double y = 0, double r = 0)
+	{
+		dx = x;
+		dy = y;
+		this->r = r;
+	}
+};
+
+class lstc
+{
+private:
+	int nitems;
+	int itemi;
+	enum
+	{
+		N_STRSMAX = 16,
+	};
+	  std::string items[N_STRSMAX];
+	int itemval[N_STRSMAX];
+public:
+	void clrlst ()
+	{
+		nitems = 0;
+	}
+	void addto (std::string s, int val);
+	void printlist (int x, int y);
+	int sele (int x, int y);
+	lstc ()
+	{
+		nitems = 0;
+		itemi = 0;
+	}
+};
+
+//timeout(50);
 
 #endif //__INH_INCED__
-

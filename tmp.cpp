@@ -3,104 +3,34 @@
 
 #include "in.h"
 
-char itli[BUFSIZ][BUFSIZ];
-int item = 0;
-int itn = 0;
-int iid[BUFSIZ];
-
-void
-clitn ()
-{
-	itn = 0;
-}
-
-void
-addtoli (char *str, int id)
-{
-	strcpy (itli[itn], str);
-	iid[itn] = id;
-	itn++;
-}
-
-void
-showitem ()
-{
-	clear ();
-	set_color (15);
-	for (int i = 0; i < itn; i++)
-	{
-		set_color (C_DW);
-		if (i == item)
-		{
-			set_color (C_LC);
-			mvaddstr (2 + i, 0, ">>");
-		}
-		mvaddstr (2 + i, 2, itli[i]);
-	}
-	refresh ();
-	return;
-}
-
-int
-selec ()
-{
-	int rval = 0;
-	item = 0;
-
-	while (1)
-	{
-		int flgtmp = 0;
-		showitem ();
-		int ch = getch ();
-		switch (ch)
-		{
-		case 'j':
-		case KEY_DOWN:
-			item++;
-			if (item >= itn)
-			{
-				item = itn - 1;
-				getch ();
-			}
-			break;
-		case 'k':
-		case KEY_UP:
-			item--;
-			if (item < 0)
-				item = 0;
-			break;
-		case '\n':
-		case '\r':
-			rval = item;
-			flgtmp = 1;
-			break;
-		case '\033':
-			return -1;
-		}
-		//showitem ();
-		if (flgtmp == 1)
-			break;
-	}
-	return rval;
-}
+#include "hanabi.h"
 
 void
 gamemain ()
 {
-	clitn ();
-	char s[3][BUFSIZ] = { "namasu", "temaso", "Ice-ogoreya" };
-	for (int i = 0; i < 3; i++)
+	lstc li;
+	std::string s[] =
+		{ "なます", "てまそ", "『アイス』おごれや……!?", "" };
+	for (int i = 0; i < 10; i++)
 	{
-		addtoli (s[i], i);
+		if (s[i].empty ())
+			break;
+		li.addto (s[i], i);
 	}
-	showitem ();
+	li.printlist (1, 5);
 #if 1
-	int val = selec ();
-	char buf[BUFSIZ];
+	int val = li.sele (1, 5);
 	clear ();
-	if (val != -1)
-		sprintf (buf, "val == %d\n", val);
-	mvaddstr (2, 2, buf);
+  std::stringstream ss;
+	ss << "val == " << val << '.' << std::endl;
+	mvaddstr (2, 2, ss.str().c_str());
+	refresh();
+	waitk();
+	hanabi h;
+	for (int i = 0;i<1000;i++)
+	{
+    h.do_it();
+	}
 #endif
 	refresh ();
 	waitk ();
@@ -133,7 +63,7 @@ main ()
 		clear ();
 		pcen ("--Ice ogoreya--", i);
 		refresh ();
-		mysleep (30);
+		mysleep (10);
 	}
 	pcen ("[press any key to continue]", 15);
 	getch ();
