@@ -54,12 +54,15 @@ initall ()
 	initscr ();
 	noecho ();
 	start_color ();
+	//nonl();
+	//cbreak();
 	for (f = 0; f < 16; f++)
 	{
 		init_pair (f, f, 0);
 	}
 	curs_set (0);
 	keypad (stdscr, TRUE);
+	leaveok(stdscr, TRUE);
 	clear ();
 	mt.seed(2);
 	//srand (time (0));
@@ -192,7 +195,7 @@ lstc::printlist (int x, int y)
 //timeout(50);
 
 int
-lstc::sele (int x = 2, int y = 5)
+lstc::sele (int x, int y)
 {
 	int eflg = 0, rval = 0;
 	itemi = 0;
@@ -221,7 +224,7 @@ lstc::sele (int x = 2, int y = 5)
 			break;
 		case '\n':
 		case '\r':
-		case '\033':
+		//case '\033':
 			return itemval[itemi];
 			break;
 		}

@@ -26,7 +26,10 @@ private:
   std::list <hanabidama> hlst;
 public:
 	void do_it();
+	void do_it_uchiage(std::list<hanabidama>::iterator itr);
+	void do_it_nagare(std::list<hanabidama>::iterator itr);
   void seiton();
+  bool is_hamidashi(double x, double y);
 	~hanabi();
 };
 

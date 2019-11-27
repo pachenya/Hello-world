@@ -130,7 +130,7 @@ public:
 	}
 	void addto (std::string s, int val);
 	void printlist (int x, int y);
-	int sele (int x, int y);
+	int sele (int x = 2, int y = 10);
 	lstc ()
 	{
 		nitems = 0;

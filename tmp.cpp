@@ -10,28 +10,55 @@ gamemain ()
 {
 	lstc li;
 	std::string s[] =
-		{ "なます", "てまそ", "『アイス』おごれや……!?", "" };
+		{ "花火", "スタート・ザ・ゲーム",  "終了", ""};
+						//"『アイス』おごれや……!?", "" };
 	for (int i = 0; i < 10; i++)
 	{
 		if (s[i].empty ())
 			break;
 		li.addto (s[i], i);
 	}
-	li.printlist (1, 5);
-#if 1
-	int val = li.sele (1, 5);
+	int val = li.sele ();
 	clear ();
-  std::stringstream ss;
-	ss << "val == " << val << '.' << std::endl;
-	mvaddstr (2, 2, ss.str().c_str());
-	refresh();
-	waitk();
-	hanabi h;
-	for (int i = 0;i<1000;i++)
-	{
-    h.do_it();
-	}
+  //std::stringstream ss;
+	//ss << "val == " << val << '.' << std::endl;
+#if 1
+	//mvaddstr (2, 2, ss.str().c_str());
+	//mvaddstr (3, 2, "[press enter to continue]"); 
+	//refresh();
+	//waitk();
 #endif
+	if(val == 0)
+  {
+	  hanabi h;
+    for (int i = 0;i<2500;i++)
+	  {
+      h.do_it();
+	    wtimeout(stdscr, 0);
+		  int ch=getch();
+		  if (ch == 'q' || ch == 'Q')
+		  {
+        break;
+		  }
+			mvaddstr(0,0,"\'q\' to exit.");
+	  }
+	}
+  else if (val == 1)
+  {
+    clear();
+		set_color(C_P);
+    pcen("--[Coming soon]--", 11);
+		refresh();
+		waitk();
+		cleanall();
+  }
+  else if (val ==2)
+  {
+    ;
+    // do nothing...;
+  }
+
+	mvaddstr(1,1, "[press enter to exit]");
 	refresh ();
 	waitk ();
 	cleanall ();
