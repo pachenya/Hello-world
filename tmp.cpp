@@ -4,6 +4,7 @@
 #include "in.h"
 
 #include "hanabi.h"
+#include "vanee.h"
 
 void
 gamemain ()
@@ -47,7 +48,12 @@ gamemain ()
   {
     clear();
 		set_color(C_P);
+#if 1
+    GameVanee vamp;
+		vamp.do_game();
+#else
     pcen("--[Coming soon]--", 11);
+#endif
 		refresh();
 		waitk();
 		cleanall();

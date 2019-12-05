@@ -1,6 +1,6 @@
 #Makefile
 TGT = namasu
-OBJS = in.o tmp.o hanabi.o
+OBJS = in.o tmp.o hanabi.o vanee.o
 INCS = in.h hanabi.h 
 LIBS = -lncurses
 
