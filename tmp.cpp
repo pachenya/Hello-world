@@ -11,7 +11,7 @@ gamemain ()
 {
 	lstc li;
 	std::string s[] =
-		{ "花火", "スタート・ザ・ゲーム",  "終了", ""};
+		{ "Hanabi", "Start the Game",  "Exit", ""};
 						//"『アイス』おごれや……!?", "" };
 	for (int i = 0; i < 10; i++)
 	{
@@ -32,7 +32,7 @@ gamemain ()
 	if(val == 0)
   {
 	  hanabi h;
-    for (int i = 0;i<2500;i++)
+    for (int i = 0;i<880;i++)
 	  {
       h.do_it();
 	    wtimeout(stdscr, 0);
@@ -48,14 +48,9 @@ gamemain ()
   {
     clear();
 		set_color(C_P);
-#if 1
     GameVanee vamp;
 		vamp.do_game();
-#else
-    pcen("--[Coming soon]--", 11);
-#endif
 		refresh();
-		waitk();
 		cleanall();
   }
   else if (val ==2)
@@ -96,7 +91,7 @@ main ()
 		clear ();
 		pcen ("--Ice ogoreya--", i);
 		refresh ();
-		mysleep (10);
+		mysleep (30);
 	}
 	pcen ("[press any key to continue]", 15);
 	getch ();

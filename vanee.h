@@ -28,6 +28,7 @@ public:
   int nitems;
 
   bool is_stackable (item_c b);
+    item_c & operator = (const item_c & r);
     item_c (std::string s, int sta, int tval, int sval, int nitems);
     item_c ();
 };
@@ -88,10 +89,20 @@ class GameVanee
 {
 private:
   psn_c * p_ptr;
+  psn_c *p_ptr2;
+  enum
+  {
+    ENEMAX,
+  };
+  psn_c *enem[ENEMAX];
 public:
+  void printpsn (psn_c * o);
+  void printpsn_at (int x, int y, psn_c & o);
   void do_game ();
+  void itemGetRand ();
     GameVanee ()
-  {;
+  {
+    ;
   }
 };
 
