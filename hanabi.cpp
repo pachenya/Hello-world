@@ -39,6 +39,15 @@ hanabi::seiton ()
 }
 
 void
+hanabi::do_it_hajike (std::list < hanabidama >::iterator itr)
+{
+  itr->x += itr->vx;
+  itr->y += itr->vy;
+  itr->vx *= 0.95;
+  itr->vy *= 0.95;
+}
+
+void
 hanabi::do_it_nagare (std::list < hanabidama >::iterator itr)
 {
   itr->x += itr->vx;
@@ -70,6 +79,26 @@ hanabi::do_it_uchiage (std::list < hanabidama >::iterator itr)
     }
     itr->k = 0;
   }
+
+  else if ((itr->y <= 10 && rn (11) == 0) || itr->y <= 1)
+  {
+    for (int i = 0; i < 32; i++)
+    {
+      double ddir = (MY_PI * 2) * (i / 32.0);
+      double speed = 0.3;
+      double vx = cos (ddir) * speed;
+      double vy = sin (ddir) * speed;
+      hanabidama d (3, rn (16), itr->x, itr->y, vx, vy);
+      hlst.push_front (d);
+      ddir = (MY_PI * 2) * (i / 32.0);
+      speed = 0.5;
+      vx = cos (ddir) * speed;
+      vy = sin (ddir) * speed;
+      hanabidama d2 (3, rn (16), itr->x, itr->y, vx, vy);
+      hlst.push_front (d2);
+    }
+    itr->k = 0;
+  }
 }
 
 void
@@ -90,6 +119,8 @@ hanabi::do_it ()
     case 2:
       do_it_nagare (itr);
       break;
+    case 3:
+      do_it_hajike (itr);
     }
     if (itr->cnt++ >= 200)
     {
@@ -117,6 +148,7 @@ hanabi::do_it ()
       mvaddch ((int) itr->y, (int) itr->x, '*');
     }
   }
+  set_color (15);
   mvaddstr (0, 0, "[\'q\'_to_exit].");
   refresh ();
   seiton ();
