@@ -123,6 +123,10 @@ public:
     GameVanee ()
   {
     dunglevel = 0;
+		for (int i=0;i<N_FLGS;i++)
+		{
+						flgs[i] = 0;
+		}
   }
 };
 

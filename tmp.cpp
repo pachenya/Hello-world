@@ -11,8 +11,7 @@ gamemain ()
 {
 	lstc li;
 	std::string s[] =
-		{ "Hanabi", "Start the Game",  "Exit", ""};
-						//"『アイス』おごれや……!?", "" };
+		{ "Hanabi", "Start the Game",  "Exit", "霊長類","『アイス』おごれや……!?", "ゴ★夫", "のスレ", "", };
 	for (int i = 0; i < 10; i++)
 	{
 		if (s[i].empty ())
@@ -97,6 +96,8 @@ main ()
 	}
 	pcen ("[press any key to continue]", 15);
 	getch ();
+	clear();
+	refresh();
 	gamemain ();
 	endwin ();
 	return 0;

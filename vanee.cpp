@@ -193,7 +193,7 @@ GameVanee::addmsg (std::string s)
   {
     cnt++;
   }
-  while (cnt >= MSGMAX)
+  if (cnt >= MSGMAX)
   {
     msgs.pop_back ();
   }
@@ -216,7 +216,7 @@ GameVanee::printmsgs ()
   }
 }
 
-#define DEFY 11
+// #define DEFY 11
 
 void
 GameVanee::tOK (std::string s)
@@ -226,7 +226,7 @@ GameVanee::tOK (std::string s)
   selel.clrlst ();
   selel.addto ("OK", 0);
   selel.sele ();
-  selel.clrlst ();
+  //selel.clrlst ();
 }
 
 int
@@ -245,55 +245,76 @@ void
 GameVanee::walkStreet ()
 {
   int mbflg = 0;
-  while(1)
-	{
-  tOK ("きみは公園のようなところで目を覚ました。");
-  tOK ("見覚えの無い風景だ。");
-	addmsg("さて、どうしたものだろう？");
-  selel.addto("しばし休憩をとる",1);
-  selel.addto("ストリートへ行く",2);
-  selel.addto("サイゼリ屋さんへ行く",3);
-  selel.addto("モルゴスをこらしめる",4);
-  selel.addto("家に帰る",5);
-	switch(selel.sele())
-	{
-  case 1:
-					tOK("きみはいつの間にか眠ってしまった。");
-					tOK("そして奇怪な夢から目覚めた。");
-					break;
-  case 5: 
-				  if (flgs[FL_ST] >= 5)
-					{
-							tOK("きみは家の場所を思い出した！");
-							tOK("この公園はうちの近所だ！");
-							if (flgs[FL_ST] >= 6)
-							{
-							  mbflg = 1;
-							}
-					}
-					else
-					{
-					  tOK("家の場所はなんとなく思い出せそうだ‥‥‥");
-					flgs[FL_ST]++;
-					}
-          break;
-  case 2:
-	case 3:
-					if (flgs[FL_ST] >= 7)
-					{
-									tOK("おぼろげに思い出してきたような気がする……");
-					}
-					else
-					{
-					  tOK("きみはここがどこなのかすらわからない！");
-					}
-					break;
-	case 4:
-					tOK("Angbandはできそうもない……");
-					break;
+  while (1)
+  {
+    tOK ("きみは公園のようなところにいる。");
+    if (flgs[FL_ST] < 1) 
+						tOK ("見覚えの無い風景だ。");
+    addmsg ("さて、どうしたものだろう？");
+		selel.clrlst();
+    selel.addto ("しばし休憩をする", 1);
+    selel.addto ("家に帰る", 5);
+    selel.addto ("喫茶店へ行く", 2);
+    selel.addto ("ラーメン屋へ行く", 2);
+    selel.addto ("サイゼリ屋さんへ行く",3 );
+    selel.addto ("モルゴスをこらしめる", 4);
+    selel.addto ("サウロンをこらしめる", 4);
+    printpsn_at (1, 17, *p_ptr);
+    switch (selel.sele ())
+    {
+    case 1:
+      tOK ("きみはいつの間にか眠ってしまった。");
+      tOK ("そして奇怪な夢から目覚めた。");
+      break;
+    case 5:
+      if (flgs[FL_ST] >= 3)
+			{
+        tOK ("きみは家の場所を思い出した！");
+        tOK ("この公園はうちの近所だ！");
+				tOK ("だがそれ以上は思い出せない");
+				tOK ("まあとにかく家には帰れそうだ．");
+        mbflg = 1;
+			}
+			else if (flgs[FL_ST] > 5)
+			{
+				mbflg = 1;
+			}
+			else if(flgs[FL_ST]==0)
+			{
+				addmsg("すべてを忘れたと思ったが……");
+				tOK ("家の場所はなんとなく思い出せそうだ‥‥‥");
+			}
+			else if (flgs[FL_ST] == 1)
+			{
+			  tOK("思い出せるはず……");
+			}
+			else if (flgs[FL_ST] > 0)
+			{
+			  tOK("もうちょっと頑張ればあるいは……");
+			}
+			flgs[FL_ST] += 1;
+      break;
+    case 2:
+    case 3:
+      if (flgs[FL_ST] >= 7)
+      {
+				addmsg("ここがどこなのかを");
+        tOK ("おぼろげに思い出してきたような気がする……");
+      }
+      else
+      {
+        tOK ("きみはここがどこなのかすらわからない！");
+				tOK("記憶の糸をたどりたいが……");
+				tOK("とくに移動しないことにした……");
+      }
+      break;
+    case 4:
+      tOK ("Angbandはできそうもない……");
+      break;
+    }
+    if (mbflg)
+      break;
   }
-	if (mbflg) break;
-	}
 }
 
 void
@@ -317,12 +338,22 @@ DEBUGMSG ()
 #endif
 }
 
-int GameVanee::dg_moveto()
+int
+GameVanee::dg_moveto ()
 {
-				addmsg("どこへ行く？");
-				selel.clrlst();
-				selel.addto("公園", 1);
-		return 0;	
+  addmsg ("どこへ行く？");
+  selel.clrlst ();
+  selel.addto ("公園", 1);
+	selel.addto ("自宅", 2);
+	int rval = selel.sele();
+	if (rval == 1)
+					walkStreet();
+	else
+	{
+    tOK("-- Coming soon --");
+		return 1;
+	}
+  return 0;
 }
 
 void
@@ -337,7 +368,13 @@ GameVanee::do_game ()
   printpsn_at (1, 17, *p_ptr);
   printpsn_at (1, 20, *p_ptr2);
   DEBUGMSG ();
+  tOK ("きみは公園のようなところで目を覚ました。");
   walkStreet ();
+	while (1)
+	{
+    if (dg_moveto())
+						break;;
+	}
   addmsg ("きみは街を歩いている。");
   addmsg ("街路樹は寒そうだ。");
   talkYN ("きみは今、寒いだろうか？");
@@ -345,5 +382,6 @@ GameVanee::do_game ()
   delete (p_ptr);
   delete (p_ptr2);
 }
+
 
 

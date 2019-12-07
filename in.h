@@ -117,30 +117,31 @@ class lstc
 private:
 	int nitems;
 	int itemi;
-	int rooru;
+	int ofs;
 	enum
 	{
+    maxy = 5,
 		N_STRSMAX = 64,
 	};
   std::string items[N_STRSMAX];
 	int itemval[N_STRSMAX];
+	void printlist (int x, int y);
+  void scrollit(int y);
+  void cleanuplist(int x, int y);
 public:
 	void clrlst ()
 	{
     itemi = 0;
-		rooru = 0;
 		nitems = 0;
+		ofs = 0;
 	}
 	void addto (std::string s, int val);
-	void printlist (int x, int y);
 	int sele (int x = 2, int y = 10);
-  void scrollit(int y);
-  void cleanuplist(int x, int y);
 	lstc ()
 	{
 		nitems = 0;
 		itemi = 0;
-		rooru = 0;
+		ofs = 0;
 	}
 };
 
