@@ -82,89 +82,6 @@ set_color (int i)
 	attrset (COLOR_PAIR (i));
 }
 
-#if 0
-class pos
-{
-private:
-	int x, y;
-public:
-	int gtx ()
-	{
-		return x;
-	}
-	int gty ()
-	{
-		return y;
-	}
-	void stx (int n)
-	{
-		x = n;
-	}
-	void sty (int n)
-	{
-		y = n;
-	}
-	pos (int x, int y):x (x), y (y)
-	{;
-	}
-};
-
-class dpos
-{
-private:
-	double dx, dy, r;
-public:
-	double x ()
-	{
-		return dx;
-	}
-	double y ()
-	{
-		return dy;
-	}
-	void stx (double x)
-	{
-		dx = x;
-	}
-	void sty (double y)
-	{
-		dy = y;
-	}
-	dpos (double x = 0, double y = 0, double r = 0)
-	{
-		dx = x;
-		dy = y;
-		this->r = r;
-	}
-};
-
-class lstc
-{
-private:
-	int nitems;
-	int itemi;
-	enum
-	{
-		N_STRSMAX = 16,
-	};
-	  std::string items[N_STRSMAX];
-	int itemval[N_STRSMAX];
-public:
-	void clrlst ()
-	{
-		nitems = 0;
-	}
-	void addto (std::string s, int val);
-	void printlist (int x, int y);
-	int sele (int x, int y);
-	lstc ()
-	{
-		nitems = 0;
-		itemi = 0;
-	}
-};
-#endif
-
 void
 lstc::addto (std::string s, int val)
 {
@@ -176,28 +93,56 @@ lstc::addto (std::string s, int val)
 }
 
 void
+lstc::cleanuplist(int x, int y)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		mvaddstr(y + i, x, 
+    "                               ");
+	}
+}
+
+void
 lstc::printlist (int x, int y)
 {
-	clear ();
+  int ofs = 0;
+  cleanuplist(x, y);
 	for (int i = 0; i < nitems; i++)
 	{
+    int iy = ofs + i + y;
+		if (iy < y) continue;
+		//if (iy >= y + max - 1) continue;
 		set_color (C_LW);
 		if (i == itemi)
 		{
 			set_color (C_LC);
-			mvaddstr (y + i, x, ">>");
+			mvaddstr (iy, x, ">>");
 		}
-		mvaddstr (y + i, x + 2, items[i].c_str ());
+		mvaddstr (iy, x + 2, items[i].c_str ());
 	}
 	refresh ();
 }
 
 //timeout(50);
 
+void
+lstc::scrollit(int y)
+{
+				itemi += y;
+				if (itemi >= nitems)
+				{
+								itemi = nitems - 1;
+				}
+				if (itemi < 0)
+				{
+								itemi = 0;
+				}
+}
+
 int
 lstc::sele (int x, int y)
 {
-	int eflg = 0, rval = 0;
+	int eflg = 0;
 	itemi = 0;
 	if (nitems <= 0)
 	{
@@ -205,30 +150,29 @@ lstc::sele (int x, int y)
 	}
 	while (1)
 	{
-		clear ();
 		printlist (x, y);
 		int ch = getch ();
 		switch (ch)
 		{
 		case 'j':
 		case KEY_DOWN:
-			itemi++;
-			if (itemi >= nitems)
-				itemi = nitems - 1;
+      scrollit(1);;
 			break;
 		case 'k':
 		case KEY_UP:
-			itemi--;
-			if (itemi < 0)
-				itemi = 0;
+			scrollit(-1);
 			break;
 		case '\n':
 		case '\r':
 		//case '\033':
-			return itemval[itemi];
+		  eflg = 1;
 			break;
 		}
+		if (eflg)
+						break;
 	}
-	return 0;
+	clear();
+	refresh();
+	return itemval[itemi];
 }
 

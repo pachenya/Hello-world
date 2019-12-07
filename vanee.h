@@ -79,6 +79,7 @@ public:
   };
   item_c items[N_BAG];
   int itemnum;
+    psn_c ();
     psn_c (psnd_t ini);
   int gsr (int skn);            // get_skill_rank();
   int getItem (item_c itm);
@@ -92,19 +93,39 @@ private:
   psn_c *p_ptr2;
   enum
   {
-    ENEMAX,
+    MSGMAX = 22,
+    ENEMAX = 32,
   };
-  psn_c *enem[ENEMAX];
-public:
+  psn_c enem[ENEMAX];
+	enum {
+					FL_ST,
+					FL_OKKKI,
+					FL_KN_SAIZE,
+				  N_FLGS,
+	};
+	int flgs[N_FLGS];
+  int dungrealm;
+  int dunglevel;
+  lstc selel;
+  std::list < std::string > msgs;
   void printpsn (psn_c * o);
   void printpsn_at (int x, int y, psn_c & o);
-  void do_game ();
+  int gainer_expe (psn_c atk, psn_c def);
   void itemGetRand ();
+  void printmsgs ();
+  void addmsg (std::string s);
+  void tOK (std::string s);
+  int talkYN (std::string s);
+  void walkStreet ();
+	int dg_moveto();
+public:
+  void do_game ();
     GameVanee ()
   {
-    ;
+    dunglevel = 0;
   }
 };
 
+#endif //  __VANEE_H_INC_
 
-#endif //  __VANEE_H_INC__
+

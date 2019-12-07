@@ -16,18 +16,20 @@ gamemain ()
 	for (int i = 0; i < 10; i++)
 	{
 		if (s[i].empty ())
+		{
 			break;
+		}
 		li.addto (s[i], i);
 	}
 	int val = li.sele ();
 	clear ();
-  //std::stringstream ss;
-	//ss << "val == " << val << '.' << std::endl;
 #if 1
-	//mvaddstr (2, 2, ss.str().c_str());
-	//mvaddstr (3, 2, "[press enter to continue]"); 
-	//refresh();
-	//waitk();
+  std::stringstream ss;
+	ss << "val == " << val << '.' << std::endl;
+	mvaddstr (2, 2, ss.str().c_str());
+	mvaddstr (3, 2, "[press enter to continue]"); 
+	refresh();
+	waitk();
 #endif
 	if(val == 0)
   {
