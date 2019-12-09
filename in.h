@@ -136,7 +136,7 @@ public:
 		ofs = 0;
 	}
 	void addto (std::string s, int val);
-	int sele (int x = 2, int y = 10);
+	int sele (int x = 2, int y = 5);
 	lstc ()
 	{
 		nitems = 0;

@@ -11,7 +11,7 @@ gamemain ()
 {
 	lstc li;
 	std::string s[] =
-		{ "Hanabi", "Start the Game",  "Exit", "霊長類","『アイス』おごれや……!?", "ゴ★夫", "のスレ", "", };
+		{ "Start the Game",  "hanabi", "Exit", "", };
 	for (int i = 0; i < 10; i++)
 	{
 		if (s[i].empty ())
@@ -22,7 +22,7 @@ gamemain ()
 	}
 	int val = li.sele ();
 	clear ();
-#if 1
+#if 0
   std::stringstream ss;
 	ss << "val == " << val << '.' << std::endl;
 	mvaddstr (2, 2, ss.str().c_str());
@@ -30,7 +30,7 @@ gamemain ()
 	refresh();
 	waitk();
 #endif
-	if(val == 0)
+	if(val == 1)
   {
 	  hanabi h;
     for (int i = 0;i<880;i++)
@@ -45,7 +45,7 @@ gamemain ()
 			mvaddstr(0,0,"\'q\' to exit.");
 	  }
 	}
-  else if (val == 1)
+  else if (val == 0)
   {
     clear();
 		set_color(C_P);

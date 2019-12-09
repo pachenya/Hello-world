@@ -122,7 +122,7 @@ hanabi::do_it ()
     case 3:
       do_it_hajike (itr);
     }
-    if (itr->cnt++ >= 200)
+    if (itr->cnt++ >= 30)
     {
       itr->k = 0;
     }

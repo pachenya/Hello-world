@@ -89,8 +89,8 @@ public:
 class GameVanee
 {
 private:
-  psn_c * p_ptr;
-  psn_c *p_ptr2;
+  psn_c * p_ptr[2];
+	psn_c * m_ptr[2];
   enum
   {
     MSGMAX = 22,
@@ -99,9 +99,7 @@ private:
   psn_c enem[ENEMAX];
 	enum {
 					FL_ST,
-					FL_OKKKI,
-					FL_KN_SAIZE,
-				  N_FLGS,
+				  N_FLGS = 256,
 	};
 	int flgs[N_FLGS];
   int dungrealm;
@@ -116,7 +114,8 @@ private:
   void addmsg (std::string s);
   void tOK (std::string s);
   int talkYN (std::string s);
-  void walkStreet ();
+  int batoru(psn_c *player_s[2], psn_c *monster_s[2]);
+	void walkStreet ();
 	int dg_moveto();
 public:
   void do_game ();
