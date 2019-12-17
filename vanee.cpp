@@ -6,6 +6,18 @@
 
 #include <stdio.h>
 
+#define _DEBUG_
+void
+DEBUGMSG (std::string s, int i = 1)
+{
+#ifdef _DEBUG_
+  move (0, 0);
+  printw ("%s%d", s.c_str (), i);
+  refresh ();
+  waitk ();
+#endif
+}
+
 item_c::item_c (std::string s, int sta, int tval, int sval, int nitems)
 {
   iname = s;
@@ -37,10 +49,12 @@ item_c & item_c::operator = (const item_c & r)
 psn_c::psn_c ()
 {
   name = "[U.N.Owen]";
+  k = 1;
 }
 
 psn_c::psn_c (psnd_t ini)
 {
+  k = 1;
   name = ini.name;
   hp = mhp = ini.hp;
   mp = mmp = ini.mmp;
@@ -81,6 +95,20 @@ psn_c & psn_c::operator = (const psn_c & r)
   return *this;
 }
 
+bool
+psn_c::operator< (const psn_c * right)
+{
+	const psn_c * left = this;
+  if (left->sk < right->sk)
+  {
+    if (left->abssk < right->abssk)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 int
 psn_c::gsr (int skn)
 {
@@ -117,8 +145,8 @@ psn_c::getItem (item_c itm)
 enum
 {
   MON_GORIO,
-  MON_TETSUO,
   MON_RANDY,
+  MON_TETSUO,
   MON_KURAGE,
   MON_SKURAGE,
   MON_KIRIKUWA,
@@ -137,9 +165,9 @@ psnd_t u[] = {
   {
    "ゴリ夫", 1, 5, 100, 100, 125, 3000, 16, 10, 9, 5},
   {
-   "テツオ", 2, 0, 80, 110, 100, 2000, 10, 12, 15, 12},
-  {
    "ランディ", 2, 22, 150, 100, 150, 2000, 18, 9, 9, 8},
+  {
+   "テツオ", 2, 0, 80, 110, 100, 2000, 10, 12, 15, 12},
   {
    "クラゲ", 1, 5, 100, 100, 125, 3000, 8, 4, 3, 3},
   {
@@ -184,6 +212,16 @@ GameVanee::printpsn_at (int x, int y, psn_c & o)
 }
 
 void
+GameVanee::clnmsg (void)
+{
+  int cnt = 3;
+  while (cnt--)
+  {
+    msgs.push_front ("                          ");
+  }
+}
+
+void
 GameVanee::addmsg (std::string s)
 {
   int cnt = 0;
@@ -214,24 +252,24 @@ GameVanee::printmsgs ()
     if (cnt <= 0)
       break;
   }
+  all_rfrs ();
 }
-
-// #define DEFY 11
 
 void
 GameVanee::tOK (std::string s)
 {
+  clnmsg ();
   addmsg (s);
   printmsgs ();
   selel.clrlst ();
   selel.addto ("OK", 0);
   selel.sele ();
-  //selel.clrlst ();
 }
 
 int
 GameVanee::talkYN (std::string s)
 {
+  clnmsg ();
   addmsg (s);
   selel.clrlst ();
   selel.addto ("Yes", 1);
@@ -241,114 +279,113 @@ GameVanee::talkYN (std::string s)
   return rval;
 }
 
-int
-GameVanee::batoru (psn_c * player_s[2], psn_c * monster_s[2])
+void
+GameVanee::all_rfrs ()
 {
-  int cnt = 0;
-  int sk[4] = { 1, 1, 1, 1 };
-  psn_c p[2] = { *player_s[0], *player_s[1] };
-  psn_c m[2] = { *monster_s[0], *monster_s[1] };
-  while (1)
+  for (int i = 0; i < 4; i++)
   {
-    int abssk[4] = { 1, 2, 3, 4 };
-    for (int i = 0; i < 4; i++)
+    if (mons[i].k)
+      printpsn_at (1, 13 + i * 2, mons[i]);
+  }
+}
+
+int
+GameVanee::do_attk (psn_c * atk, psn_c * def)
+{
+  int rval = 0;
+  std::stringstream ss;
+  if (rn (20) && rn (atk->stDex / 2))
+  {
+    int dam = 1 + rn (atk->stStr / 2) + rn (atk->stStr / 2);
+    ss << atk->name << "は" << def->name << "への攻撃を当てた！" << "(" << dam << ")";
+    def->hp -= dam;
+    tOK (ss.str ());
+    if (def->hp < 0)
+      rval = 1;
+  }
+  else
+  {
+    ss << atk->name << "の" << def->name << "への攻撃は外れた！";
+    tOK (ss.str ());
+    rval = 0;
+  }
+  return rval;
+}
+
+int
+GameVanee::batoru ()
+{
+  int rval = 0, done = 0;
+	psn_c * m[16] = {&mons[0], &mons[1]};
+  int abssk[2] = { 1, 2 };
+  for (int i = 0; i < 2; i++)
+  {
+    m[i]->sk = 100;
+  }
+  int goflg;
+
+  while (!done)
+  {
+    goflg = 0;
+#if 0
+    for (int i = 0; i < 2; i++)
     {
-      //shaffuru
-      int r = rn (4);
+      int r = rn (2);
+      //swap
       int tmp = abssk[i];
       abssk[i] = abssk[r];
       abssk[r] = tmp;
     }
-    while (1)
+    for (int i = 0; i < 2; i++)
     {
-      sk[0] += (p[0].stDex / 2) + rn (6);
-      //sk[1] += (p[1].stDex / 2) + rn (6);
-      sk[2] += (m[0].stDex / 2) + rn (6);
-      //sk[3] += (m[1].stDex / 2) + rn (6);
-      for (int k = 0; k < 4; k++)
+      m[i]->abssk = abssk[i];
+    }
+#endif
+    for (int i = 0; i < 2; i++)
+    {
+      m[i]->sk -= (10 + rn (m[i]->stDex / 2));
+      if (m[i]->sk <= 0)
       {
-        if (sk[k] < 100) continue;
-          sk[k] = 0;
-        enum
-        {
-          CM_AT,
-          CM_SK,
-          CM_GA,
-          CM_EC,
-          N_CMS,
-        };
-
-        printpsn_at (1, 17, p[0]);
-        printpsn_at (1, 19, m[0]);
-        if (k <= 1 && p[k].hp > 0)
-        {
-          lstc cmd;
-          cmd.addto ("攻撃", CM_AT);
-          cmd.addto ("技", CM_SK);
-          cmd.addto ("防御", CM_GA);
-          cmd.addto ("逃走", CM_EC);
-          int action = cmd.sele ();
-					cmd.clrlst();
-          if (action == CM_EC)
-          {
-            if (rn (20) && rn (20) + 1 < p[k].stDex / 2)
-            {
-              tOK ("きみは逃走に成功した！");
-              return 0;
-            }
-            else
-            {
-              tOK ("逃げられなかった！");
-            }
-          }
-          else if (action == CM_GA)
-          {
-            tOK ("きみは防御する！");
-            ;
-          }
-          else if (action == CM_AT)
-          {
-            if (rn (20))
-            {
-              int dam = 1 + rn (p[k].stStr + rn (p[k].stStr) + p[k].stStr);
-              char buf[BUFSIZ];
-              sprintf (buf,
-                       "%sは%sに攻撃をあてた！ (%d)",
-											 p[k].name.c_str(),
-                       m[0].name.c_str (), dam);
-              tOK (buf);
-							m[0].hp -= dam;
-							if (m[0].hp <= 0)
-							{
-							  tOK ("きみは勝った！");
-								return 0;
-							}
-            }
-            else
-            {
-              tOK ("攻撃は命中しなかった！");
-            }
-          }
-        }
-        else                    // monst
-        {
-				  char buf[BUFSIZ];
-              int dam = 1 + rn (m[k].stStr + rn (m[k].stStr) + m[k].stStr);
-					sprintf(buf, "%sは%sに攻撃をあてた！(%d)",
-				    m[0].name.c_str(),
-						p[0].name.c_str(), dam);
-					  p[0].hp -= dam;
-						tOK(buf);
-						if (p[0].hp <= 0)
-						{
-              printpsn_at (1, 17, *p_ptr[0]);
-				      tOK("負けた……"); 
-						  return 0;
-						}
-				}
+        goflg = 1;
       }
     }
+		if (!goflg) 
+			continue;
+    if (goflg)
+    {
+      for (int i = 0; i < 2; i++)
+      {
+        psn_c *mtmp = m[i];
+        if (!mtmp->is_enemy && mtmp->sk <= 0)
+        {
+          mtmp->sk += 100;
+          do_attk (mtmp, &mons[1]);
+          if (mons[1].hp < 0)
+          {
+            rval = 1;
+            done = 1;
+          }
+        }
+        else if (mtmp->is_enemy && mtmp->sk <= 0) // is enem
+        {
+          mtmp->sk += 100;
+          do_attk (mtmp, &mons[0]);
+          if (mons[0].hp <= 0)
+          {
+            rval = 0;
+            done = 1;
+          }
+        }
+      }
+    }
+    if (!m[0]->k || !m[1]->k)
+      done = 1;
   }
+  if (rval == 0)
+    tOK ("きみは負けた……");
+  else
+    tOK ("勝った！");
+  return rval;
 }
 
 void
@@ -363,7 +400,6 @@ GameVanee::walkStreet ()
     addmsg ("さて、どうしたものだろう？");
     selel.clrlst ();
     selel.addto ("しばし休憩をする", 1);
-    selel.addto ("家に帰る", 5);
     if (flgs[1] == 0)
     {
       selel.addto ("喫茶店へ行く", 2);
@@ -375,13 +411,14 @@ GameVanee::walkStreet ()
       selel.addto ("モルゴスをこらしめる", 4);
       selel.addto ("サウロンをこらしめる", 4);
     }
-    printpsn_at (1, 17, *p_ptr[0]);
+    if (flgs[1])
+      selel.addto ("家に帰る", 5);
     switch (selel.sele ())
     {
     case 1:
       tOK ("きみはいつの間にかベンチで眠ってしまった。");
-      p_ptr[0]->hp = p_ptr[0]->mhp;
-      p_ptr[0]->mp = p_ptr[0]->mmp;
+      mons[0].hp = mons[0].mhp;
+      mons[0].mp = mons[0].mmp;
       tOK ("そして奇怪な夢から目覚めた。");
       break;
     case 5:
@@ -439,24 +476,22 @@ void
 GameVanee::itemGetRand ()
 {
   item_c itm ("★★止まらない『ヒザ』", 1, item_c::TV_ARM, 1, 1);
-  p_ptr[0]->getItem (itm);
+  mons[0].getItem (itm);
+#if 0
   item_c itm2 ("★アイスごと投げられる", 1, item_c::TV_ARM, 1, 2);
-  p_ptr[1]->getItem (itm2);
-	item_c itm3 ("★★★『本場のファイト』", 1, item_c::TV_ARM, 1, 3);
-	m_ptr[0]->getItem (itm3);
-}
-
-void
-DEBUGMSG ()
-{
-#ifdef _DEBUG_
-  static unsigned char p = 0;
-  addch ('a' + p);
-  p++;
-  refresh ();
-  waitk ();
+  mons[1] getItem (itm2);
+#endif
+  item_c itm3 ("★★★『本場のファイト』", 1, item_c::TV_ARM, 1,
+               3);
+  mons[1].getItem (itm3);
+#if 0
+  m_ptr[0]->getItem (itm3);
+  item_c itm4 ("★ユリ超ごっついタイガーバズーカ", 1,
+               item_c::TV_ARM, 1, 4);
+  m_ptr[1]->getItem (itm4);
 #endif
 }
+
 
 int
 GameVanee::dg_moveto ()
@@ -480,18 +515,25 @@ void
 GameVanee::do_game ()
 {
   // printplayer
-  p_ptr[0] = new psn_c (u[0]);
-  p_ptr[1] = new psn_c (u[1]);
-  m_ptr[0] = new psn_c (u[2]);
-  m_ptr[1] = new psn_c (u[3]);
+  mons.push_back (psn_c (u[0]));
+  mons.push_back (psn_c (u[1]));
+  mons.push_back (psn_c (u[2]));
+  mons.push_back (psn_c (u[3]));
+  mons.push_back (psn_c (u[4]));
   itemGetRand ();
   move (2, 2);
   set_color (15);
-  printpsn_at (1, 17, *p_ptr[0]);
-  printpsn_at (1, 19, *p_ptr[1]);
-  DEBUGMSG ();
-  batoru (p_ptr, m_ptr);
-  p_ptr[0]->hp = (rn (5) + 10);
+  mons[0].mp = 60;
+	mons[0].is_enemy = 0;
+	mons[1].is_enemy = 1;
+	mons[2].k = 0;
+	mons[3].k = 0;
+	mons[4].k = 0;
+  DEBUGMSG ("batoru hajime.");
+  batoru ();
+  DEBUGMSG ("batoru owari.");
+  mons[0].hp = 10 + rn (20);
+  mons[1].k = 0;
   tOK ("......");
   tOK ("きみは公園のようなところで目を覚ました。");
   walkStreet ();
@@ -501,11 +543,6 @@ GameVanee::do_game ()
       break;;
   }
   addmsg ("きみは街を歩いている。");
-  addmsg ("街路樹は寒そうだ。");
-  talkYN ("きみは今、寒いだろうか？");
-  tOK ("なるほど。じゃあな。");
-  delete (p_ptr[0]);
-  delete (p_ptr[1]);
-  delete (m_ptr[0]);
-  delete (m_ptr[1]);
+  talkYN ("きみは今、すこしは楽しいだろうか？");
+  tOK ("なるほど。じゃあね。");
 }

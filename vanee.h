@@ -6,6 +6,8 @@
 #define __VANEE_H_INC__
 
 #include "in.h"
+#include <vector>
+#include <algorithm>
 
 class item_c
 {
@@ -54,12 +56,15 @@ public:
 class psn_c
 {
 public:
-  std::string name;
+  int k;
+    std::string name;
   int hp, mhp, mp, mmp;
   int sta, msta;
   int gold;
   int level, expe;
   int stStr, stDex, stInt, stChr;
+  int is_enemy;
+  int sk, abssk;
   enum
   {
     SK_FIG,                     // == 0
@@ -83,52 +88,55 @@ public:
     psn_c (psnd_t ini);
   int gsr (int skn);            // get_skill_rank();
   int getItem (item_c itm);
+  bool operator < (const psn_c * right);
+  //bool operator < (const psn_c * left, const psn_c * right);
     psn_c & operator = (const psn_c & r);
 };
 
 class GameVanee
 {
 private:
-  psn_c * p_ptr[2];
-	psn_c * m_ptr[2];
+  std::vector < psn_c > mons;   //incl. PC!
   enum
   {
     MSGMAX = 22,
     ENEMAX = 32,
   };
   psn_c enem[ENEMAX];
-	enum {
-					FL_ST,
-				  N_FLGS = 256,
-	};
-	int flgs[N_FLGS];
+  enum
+  {
+    FL_ST,
+    N_FLGS = 256,
+  };
+  int flgs[N_FLGS];
   int dungrealm;
   int dunglevel;
   lstc selel;
-  std::list < std::string > msgs;
+    std::list < std::string > msgs;
   void printpsn (psn_c * o);
   void printpsn_at (int x, int y, psn_c & o);
   int gainer_expe (psn_c atk, psn_c def);
   void itemGetRand ();
+  void all_rfrs ();
   void printmsgs ();
+  void clnmsg (void);
   void addmsg (std::string s);
   void tOK (std::string s);
   int talkYN (std::string s);
-  int batoru(psn_c *player_s[2], psn_c *monster_s[2]);
-	void walkStreet ();
-	int dg_moveto();
+  int do_attk (psn_c * atk, psn_c * def);
+  int batoru ();
+  void walkStreet ();
+  int dg_moveto ();
 public:
   void do_game ();
     GameVanee ()
   {
     dunglevel = 0;
-		for (int i=0;i<N_FLGS;i++)
-		{
-						flgs[i] = 0;
-		}
+    for (int i = 0; i < N_FLGS; i++)
+    {
+      flgs[i] = 0;
+    }
   }
 };
 
 #endif //  __VANEE_H_INC_
-
-
