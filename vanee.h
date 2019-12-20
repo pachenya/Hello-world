@@ -121,7 +121,7 @@ private:
   void printmsgs ();
   void clnmsg (void);
   void addmsg (std::string s);
-  void tOK (std::string s);
+  void tOK (std::string s, std::string s2 = "OK");
   int talkYN (std::string s);
   int do_attk (psn_c * atk, psn_c * def);
   int batoru ();

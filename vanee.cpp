@@ -256,13 +256,13 @@ GameVanee::printmsgs ()
 }
 
 void
-GameVanee::tOK (std::string s)
+GameVanee::tOK (std::string s, std::string s2)
 {
   clnmsg ();
   addmsg (s);
   printmsgs ();
   selel.clrlst ();
-  selel.addto ("OK", 0);
+  selel.addto (s2, 0);
   selel.sele ();
 }
 
@@ -453,7 +453,7 @@ GameVanee::walkStreet ()
     case 3:
       if (!flgs[1])
       {
-        tOK ("きみはここがどこなのかすらわからない！");
+        tOK ("きみはここがどこなのかすらわからない！", "わからない……");
         tOK ("記憶の糸をたどりたいが……");
         tOK ("とくに移動しないことにした……");
         flgs[1] = 1;
